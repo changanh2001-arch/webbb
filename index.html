@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBA English - Full Translation & Explanation</title>
+    <style>
+        :root { --primary: #2c3e50; --success: #27ae60; --hint: #f39c12; --bg: #f4f7f6; --blue: #3498db; --vi: #e67e22; }
+        body { font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: var(--bg); overflow-x: hidden; }
+        .card { background: white; padding: 25px 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 95%; max-width: 650px; }
+        
+        .status-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 12px; color: #7f8c8d; font-weight: bold; }
+        
+        /* CÂU ĐỀ: DỊCH TRỌN VẸN CẢ CÂU VÍ DỤ */
+        .hint-container { text-align: left; border-left: 5px solid var(--primary); padding-left: 15px; margin-bottom: 25px; background: #fff; }
+        .chinese-hint { font-size: 19px; color: var(--primary); font-weight: 600; display: block; line-height: 1.5; }
+        .vietnamese-hint { font-size: 16px; color: var(--vi); display: block; margin-top: 8px; font-weight: 500; line-height: 1.5; }
+        
+        .sentence-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; align-items: baseline; font-size: 24px; color: #444; margin-bottom: 20px; font-weight: 500; }
+        input { border: none; border-bottom: 3px solid #bdc3c7; font-size: 24px; width: 130px; text-align: center; outline: none; color: #2980b9; font-weight: bold; background: transparent; transition: all 0.2s; }
+        input.correct { color: var(--success) !important; border-bottom-color: var(--success) !important; }
+        
+        /* GIẢI THÍCH CHI TIẾT SONG NGỮ */
+        .explanation { margin-top: 15px; opacity: 0; transition: opacity 0.5s; background: #fff; padding: 15px; border-radius: 8px; display: none; text-align: left; border: 1px solid #e0e6ed; }
+        .explanation.show { opacity: 1; display: block; }
+        .exp-label { font-size: 11px; font-weight: bold; color: #95a5a6; text-transform: uppercase; display: block; margin-bottom: 4px; border-bottom: 1px solid #f0f0f0; padding-bottom: 2px; }
+        .col-box { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+        .col-item { background: #f0f7ff; color: #007aff; padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: 500; border: 1px solid #d1e9ff; }
+        .vi-detail { color: var(--vi); font-size: 14px; margin-top: 5px; font-weight: 500; }
+
+        .timer-container { width: 100%; height: 4px; background: #eee; margin-top: 20px; border-radius: 5px; overflow: hidden; visibility: hidden; }
+        .timer-bar { width: 100%; height: 100%; background: var(--success); }
+
+        .mobile-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { border: none; padding: 14px 5px; border-radius: 10px; color: white; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+        .btn:active { transform: scale(0.95); }
+        .btn-check { background-color: var(--success); grid-column: span 2; font-size: 15px; }
+        .btn-speak { background-color: var(--blue); }
+        .btn-prev { background-color: #95a5a6; }
+        .btn-hint { background-color: var(--hint); }
+        .btn-next { background-color: #34495e; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="status-bar">
+            <span id="progress">Day 1-30 | MBA English</span>
+            <span style="color:var(--success)">📢 Auto Pronounce ON</span>
+        </div>
+
+        <div class="hint-container">
+            <span class="chinese-hint" id="cn-hint">点击屏幕开始练习</span>
+            <span class="vietnamese-hint" id="vi-hint">Nhấn vào để bắt đầu học</span>
+        </div>
+        
+        <div class="sentence-row">
+            <span id="prefix"></span>
+            <input type="text" id="ansInput" autocomplete="off" placeholder="____">
+            <span id="suffix"></span>
+        </div>
+
+        <div id="expBox" class="explanation">
+            <div style="margin-bottom: 12px;">
+                <span class="exp-label">词义解析 | Giải nghĩa từ</span>
+                <div id="expWordCn" style="color: var(--primary); font-weight: bold; font-size: 16px;"></div>
+                <div id="expWordVi" class="vi-detail"></div>
+            </div>
+            
+            <div>
+                <span class="exp-label">常用搭配 | Cụm từ đi kèm</span>
+                <div class="col-box" id="expCol"></div>
+            </div>
+        </div>
+
+        <div id="timerContainer" class="timer-container">
+            <div id="timerBar" class="timer-bar"></div>
+        </div>
+
+        <div class="mobile-controls">
+            <button class="btn btn-check" onclick="handleCheck()">✔️ KIỂM TRA / TIẾP TỤC</button>
+            <button class="btn btn-speak" onclick="handleSpeak()">🔊 NGHE CẢ CÂU</button>
+            <button class="btn btn-prev" onclick="handlePrev()">⬅️ TRƯỚC</button>
+            <button class="btn btn-hint" onclick="handleHint()">💡 GỢI Ý</button>
+            <button class="btn btn-next" onclick="handleNext()">➡️ TIẾP</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // DAY 1: TUYỂN DỤNG (RECRUITMENT)
+            { 
+                ans: "resume", pre: "Fax your", suf: "and cover letter to the above number.", 
+                cn_sent: "请将您的简历和求职信传真至上述号码。", vi_sent: "Hãy gửi sơ yếu lý lịch và đơn xin việc của bạn qua fax đến số bên trên.", 
+                word_cn: "résumé: 简历", word_vi: "Sơ yếu lý lịch.", 
+                col: ["submit a résumé", "cover letter", "send a résumé"]
+            },
+            { 
+                ans: "opening", pre: "There are several job", suf: "at the restaurant right now.", 
+                cn_sent: "现在这家餐厅有几个职位空缺。", vi_sent: "Đang có một vài vị trí công việc còn trống ở nhà hàng.", 
+                word_cn: "opening: 空缺", word_vi: "Vị trí trống, sự mở cửa.", 
+                col: ["job opening", "vacancy", "an opening in"]
+            },
+            { 
+                ans: "applicant", pre: "All", suf: "are required to submit a résumé.", 
+                cn_sent: "所有申请人必须提交简历。", vi_sent: "Các ứng viên cần phải nộp sơ yếu lý lịch.", 
+                word_cn: "applicant: 申请人", word_vi: "Ứng viên, người xin việc.", 
+                col: ["complete an application", "submit an application"]
+            },
+            { 
+                ans: "requirement", pre: "A driver's license is a", suf: "of this job.", 
+                cn_sent: "驾驶执照是这项工作的必要条件。", vi_sent: "Giấy phép lái xe là một điều kiện cần cho công việc này.", 
+                word_cn: "requirement: 必要条件", word_vi: "Yêu cầu, điều kiện cần thiết.", 
+                col: ["meet the requirements", "a requirement of/for"]
+            },
+            { 
+                ans: "meet", pre: "Applicants must", suf: "all the requirements for the job.", 
+                cn_sent: "申请人必须符合该职位的全部要求。", vi_sent: "Các ứng viên phải đáp ứng tất cả yêu cầu của công việc.", 
+                word_cn: "meet: 满足, 符合", word_vi: "Đáp ứng, thỏa mãn (yêu cầu, điều kiện).", 
+                col: ["meet expectations", "meet needs", "meet customer demand"]
+            },
+            { 
+                ans: "qualified", pre: "People with master's degrees are", suf: "for the position.", 
+                cn_sent: "拥有硕士学位的人有资格胜任该职位。", vi_sent: "Những người có bằng thạc sĩ thì đủ điều kiện cho vị trí này.", 
+                word_cn: "qualified: 有资格的", word_vi: "Đủ khả năng, trình độ, điều kiện.", 
+                col: ["be qualified for", "highly qualified"]
+            },
+            { 
+                ans: "candidate", pre: "Five", suf: "will be selected for final interviews.", 
+                cn_sent: "将选出五位候选人进行最终面试。", vi_sent: "Năm ứng viên sẽ được chọn vào vòng phỏng vấn cuối cùng.", 
+                word_cn: "candidate: 候选人", word_vi: "Thí sinh, ứng viên.", 
+                col: ["qualified candidate", "final candidate"]
+            },
+            { 
+                ans: "confidence", pre: "We have", suf: "that she can handle the position.", 
+                cn_sent: "我们有信心她能胜任这个职位。", vi_sent: "Chúng tôi có lòng tin rằng cô ấy có thể đảm đương vị trí này.", 
+                word_cn: "confidence: 信心", word_vi: "Sự tự tin, lòng tin.", 
+                col: ["show/express confidence in", "in confidence"]
+            },
+            { 
+                ans: "professional", pre: "Jeff is known as a", suf: "photographer.", 
+                cn_sent: "杰夫是一位著名的专业摄影师。", vi_sent: "Jeff được biết đến như một nhiếp ảnh gia chuyên nghiệp.", 
+                word_cn: "professional: 专业的", word_vi: "Chuyên nghiệp, chuyên gia.", 
+                col: ["professional certification", "health professional"]
+            },
+            { 
+                ans: "interview", pre: "The", suf: "are being held in meeting room three.", 
+                cn_sent: "面试正在第三会议室进行。", vi_sent: "Các cuộc phỏng vấn đang được thực hiện tại phòng họp số 3.", 
+                word_cn: "interview: 面试", word_vi: "Cuộc phỏng vấn, thực hiện phỏng vấn.", 
+                col: ["conduct an interview", "job interview"]
+            },
+            { 
+                ans: "hire", pre: "The company plans to", suf: "ten new employees.", 
+                cn_sent: "公司计划招聘十名新员工。", vi_sent: "Công ty có kế hoạch tuyển thêm 10 nhân viên mới.", 
+                word_cn: "hire: 雇用", word_vi: "Thuê, mướn, tuyển dụng.", 
+                col: ["hire more staff", "newly hired"]
+            },
+            { 
+                ans: "training", pre: "The new hires will receive", suf: "next week.", 
+                cn_sent: "新员工下周将接受培训。", vi_sent: "Các nhân viên mới sẽ được đào tạo vào tuần tới.", 
+                word_cn: "training: 训练", word_vi: "Sự đào tạo, huấn luyện.", 
+                col: ["on-the-job training", "vocational training"]
+            },
+            { 
+                ans: "reference", pre: "Please provide three", suf: "with your application.", 
+                cn_sent: "请在申请书中提供三份推荐信。", vi_sent: "Vui lòng cung cấp 3 người tham chiếu kèm đơn xin việc.", 
+                word_cn: "reference: 推荐信, 参考", word_vi: "Người tham chiếu, tài liệu tham khảo.", 
+                col: ["reference letter", "with reference to"]
+            },
+            { 
+                ans: "achievement", pre: "List all your", suf: "on your resume.", 
+                cn_sent: "在简历中列出你所有的成就。", vi_sent: "Hãy liệt kê tất cả thành tựu của bạn vào sơ yếu lý lịch.", 
+                word_cn: "achievement: 成就", word_vi: "Thành tựu, thành tích.", 
+                col: ["sense of achievement", "outstanding achievement"]
+            },
+            { 
+                ans: "position", pre: "The", suf: "of sales manager is still vacant.", 
+                cn_sent: "销售经理的职位仍然空缺。", vi_sent: "Vị trí quản lý bán hàng vẫn còn đang trống.", 
+                word_cn: "position: 职位", word_vi: "Vị trí, chức vụ.", 
+                col: ["apply for a position", "accept a position"]
+            },
+            { 
+                ans: "excellent", pre: "She has", suf: "communication skills.", 
+                cn_sent: "她有出色的沟通技巧。", vi_sent: "Cô ấy có kỹ năng giao tiếp xuất sắc.", 
+                word_cn: "excellent: 优秀的", word_vi: "Xuất sắc, ưu tú.", 
+                col: ["excellent performance", "excellent service"]
+            },
+            { 
+                ans: "eligible", pre: "You are", suf: "for the employee discount.", 
+                cn_sent: "你有资格享受员工折扣。", vi_sent: "Bạn đủ điều kiện để được hưởng giảm giá cho nhân viên.", 
+                word_cn: "eligible: 有资格的", word_vi: "Đủ tư cách, đủ điều kiện.", 
+                col: ["be eligible for", "eligible bachelor"]
+            }
+        ];
+
+        let idx = 0; let isCorrect = false; let nextTimeout;
+        const input = document.getElementById('ansInput');
+
+        function speakFull() {
+            window.speechSynthesis.cancel();
+            const q = questions[idx];
+            const textToSpeak = `${q.pre} ${q.ans} ${q.suf}`;
+            const msg = new SpeechSynthesisUtterance(textToSpeak);
+            msg.lang = 'en-US';
+            msg.rate = 1.6; 
+            window.speechSynthesis.speak(msg);
+        }
+
+        function load() {
+            clearTimeout(nextTimeout); isCorrect = false;
+            document.getElementById('timerContainer').style.visibility = "hidden";
+            document.getElementById('timerBar').style.transition = "none";
+            document.getElementById('timerBar').style.width = "100%";
+            document.getElementById('expBox').classList.remove('show');
+            
+            const q = questions[idx];
+            document.getElementById('progress').innerText = `Day 1-30 | ${idx + 1}/${questions.length}`;
+            document.getElementById('cn-hint').innerText = q.cn_sent;
+            document.getElementById('vi-hint').innerText = q.vi_sent;
+            document.getElementById('prefix').innerText = q.pre;
+            document.getElementById('suffix').innerText = q.suf;
+            
+            input.value = ""; input.className = ""; input.disabled = false;
+            input.style.width = (q.ans.length * 18 + 40) + "px";
+            if (window.innerWidth > 768) input.focus();
+            
+            setTimeout(speakFull, 600); 
+        }
+
+        function handleCheck() {
+            if (isCorrect) { handleNext(); return; }
+            const q = questions[idx];
+            if (input.value.toLowerCase().trim() === q.ans.toLowerCase()) {
+                isCorrect = true;
+                input.classList.add('correct');
+                input.disabled = true;
+                
+                // Cập nhật hộp giải thích song ngữ
+                document.getElementById('expWordCn').innerText = q.word_cn;
+                document.getElementById('expWordVi').innerText = "Giải nghĩa: " + q.word_vi;
+                document.getElementById('expCol').innerHTML = q.col.map(c => `<span class="col-item">${c}</span>`).join('');
+                document.getElementById('expBox').classList.add('show');
+                
+                speakFull();
+                
+                document.getElementById('timerContainer').style.visibility = "visible";
+                setTimeout(() => {
+                    document.getElementById('timerBar').style.transition = "width 10s linear";
+                    document.getElementById('timerBar').style.width = "0%";
+                }, 50);
+                nextTimeout = setTimeout(handleNext, 10000);
+            } else {
+                input.style.borderBottomColor = "red";
+                setTimeout(() => input.style.borderBottomColor = "#bdc3c7", 500);
+            }
+        }
+
+        function handleSpeak() { speakFull(); }
+        function handlePrev() { if (idx > 0) { idx--; load(); } }
+        function handleNext() { idx = (idx + 1) % questions.length; load(); }
+        function handleHint() { input.value = questions[idx].ans; input.style.color = "var(--hint)"; speakFull(); }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleCheck();
+            if (e.key === 'ArrowLeft') handlePrev();
+            if (e.key === 'ArrowRight') handleNext();
+        });
+
+        window.addEventListener('click', () => {
+            if (document.getElementById('cn-hint').innerText.includes("点击")) load();
+        }, { once: true });
+    </script>
+</body>
+</html>
